@@ -16,20 +16,12 @@ object Lab1ReduceByKey extends App {
     .getOrCreate()
 
 
-  val ordersRdd = spark.sparkContext.textFile(path = ordersFilePath)
+  spark.sparkContext.textFile(path = ordersFilePath)
     .map(data => data.split('\t'))
     .map(line => Order(line.head.toInt, line(1).toInt, line(2).toInt, line(3).toInt, line(4), line(5)))
-
-  val numberOfProductsRdd = ordersRdd
-    .map(item => (item.customerId, item.numberOfProducts))
-    .reduceByKey(_ + _)
-
-  val successOrdersRdd = ordersRdd
-    .filter(_.status == "delivered")
-    .map(item => (item.customerId, 1))
-    .reduceByKey(_ + _)
-
-  numberOfProductsRdd.join(successOrdersRdd)
+    .map(item => item.customerId -> (item.numberOfProducts, if (item.status == "delivered") 1 else 0))
+    .reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2))
     .map{ case (customerId, (numOfProd, sucOrdersCount)) => (customerId, numOfProd, sucOrdersCount)}
+    .sortBy(_._1)
     .foreach(println)
 }
