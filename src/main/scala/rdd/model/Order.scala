@@ -1,4 +1,4 @@
-package rdd.Lab1ReduceByKey
+package rdd.model
 
 case class Order(
                   customerId: Int,

@@ -1,6 +1,7 @@
 package rdd.Lab1ReduceByKey
 
 import org.apache.spark.sql.SparkSession
+import rdd.model.Order
 
 object Lab1ReduceByKey extends App {
   /*
