@@ -2,10 +2,10 @@ package rdd.Lab2Join
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import rdd.model.{Order, Product}
+import rdd.DataModels.{Order, Product}
 
 import java.sql.Date
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 class Lab2Join(implicit sc: SparkContext) {
   /*
