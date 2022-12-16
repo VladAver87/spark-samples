@@ -36,7 +36,7 @@ object Lab1ReduceByKey {
       .setAppName("Lab1ReduceByKey")
     val sc = new SparkContext(sparkConf)
 
-    val orderFilePath = "/Users/vladislav/Documents/task_spark/dataset/order/order.csv"
+    val orderFilePath = ""
 
     sc.textFile(orderFilePath).flatMap {
       _.split("\t") match {
@@ -54,9 +54,9 @@ object Lab1ReduceByKey {
       }
     }
       .map(order => (order.customerId, (order.numberOfProducts, 1)))
-      .reduceByKey { case ((numProducts1, count1), (numProducts2, count2)) =>
-        (numProducts1 + numProducts2, count1 + count2)
-      }
+      .reduceByKey( (numProducts, count) =>
+        (numProducts._1 + numProducts._2, count._1 + count._2)
+      )
       .sortBy(_._1)
       .foreach { case (custId, (numberOfProd, count)) =>
         println(s"id: $custId, products number: $numberOfProd, count_delivered: $count")
