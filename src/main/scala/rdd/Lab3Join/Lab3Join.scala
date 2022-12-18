@@ -8,22 +8,23 @@ import rdd.DataModels.{Customer, Order, Product}
 import java.sql.Date
 import scala.util.{Failure, Success, Try}
 
-object Lab3Join {
+class Lab3Join(customersFilePath: String,
+               ordersFilePath: String,
+               productsFilePath: String) (implicit sc: SparkContext) {
   /*
    * Lab3 - пример использования join
    * Расчитать кто и сколько сделал заказов, за какие даты, на какую сумму.
    * Итоговое множество содержит поля: customer.name, order.order.orderDate, sum(order.numberOfProduct * product.price)
    * */
 
-  val sparkConf: SparkConf = new SparkConf()
-    .setMaster("local[*]")
-    .setAppName("Lab3Join")
-  val sc = new SparkContext(sparkConf)
   val customersFailAcc: LongAccumulator = sc.longAccumulator
   val ordersFailAcc: LongAccumulator = sc.longAccumulator
   val productsFailAcc: LongAccumulator = sc.longAccumulator
 
-  def job(customersFilePath: String, ordersFilePath: String, productsFilePath: String): Unit = {
+  def job(customersFilePath: String = customersFilePath,
+          ordersFilePath: String = ordersFilePath,
+          productsFilePath: String = productsFilePath
+         ): Unit = {
 
     val customers = getCustomers(customersFilePath = customersFilePath)
       .map(customer => customer.id -> customer.name)
@@ -120,13 +121,24 @@ object Lab3Join {
       case _ => None
     }
   }
+}
 
+object Lab3Join {
+  val sparkConf: SparkConf = new SparkConf()
+    .setMaster("local[*]")
+    .setAppName("Lab3Join")
+  implicit val sc: SparkContext = new SparkContext(sparkConf)
+}
+
+object Test {
   def main(args: Array[String]): Unit = {
     val customersFilePath = ""
     val ordersFilePath = ""
     val productsFilePath = ""
 
-    job(
+  import Lab3Join.sc
+
+    new Lab3Join(customersFilePath, ordersFilePath, productsFilePath).job(
       customersFilePath = customersFilePath,
       ordersFilePath = ordersFilePath,
       productsFilePath = productsFilePath
