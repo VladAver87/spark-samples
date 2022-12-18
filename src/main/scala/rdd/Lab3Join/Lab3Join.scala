@@ -59,8 +59,7 @@ object Lab3Join {
   }
 
 
-  private def getCustomers(
-                            customersFilePath: String,
+  private def getCustomers(customersFilePath: String,
                             separator: String = "\t"
                           ): RDD[Customer] = sc.textFile(customersFilePath).flatMap {
     _.split(separator, -1) match {
