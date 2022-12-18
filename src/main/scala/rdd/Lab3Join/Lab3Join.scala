@@ -22,10 +22,6 @@ object Lab3Join {
   val customersFailAcc: LongAccumulator = sc.longAccumulator
   val ordersFailAcc: LongAccumulator = sc.longAccumulator
   val productsFailAcc: LongAccumulator = sc.longAccumulator
-  val customersFilePath = ""
-  val ordersFilePath = ""
-  val productsFilePath = ""
-
 
   def job(customersFilePath: String, ordersFilePath: String, productsFilePath: String): Unit = {
 
@@ -126,6 +122,10 @@ object Lab3Join {
   }
 
   def main(args: Array[String]): Unit = {
+    val customersFilePath = ""
+    val ordersFilePath = ""
+    val productsFilePath = ""
+
     job(
       customersFilePath = customersFilePath,
       ordersFilePath = ordersFilePath,
