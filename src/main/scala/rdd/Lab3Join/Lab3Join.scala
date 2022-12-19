@@ -53,6 +53,8 @@ class Lab3Join(customersFilePath: String,
     println(s"Total of failed rows while parsing customers data: ${customersFailAcc.count}")
     println(s"Total of failed rows while parsing orders data: ${ordersFailAcc.count}")
     println(s"Total of failed rows while parsing products data: ${productsFailAcc.count}")
+
+    sc.stop()
   }
 
 
