@@ -22,7 +22,7 @@ class Lab5GroupBy(ordersFilePath: String)(implicit sc: SparkContext) {
       .map(order => order.customerId -> order.numberOfProducts)
       .groupByKey()
       .map{ case (custId, numbersOfProd) =>
-        custId -> (numbersOfProd.sum, numbersOfProd.size, numbersOfProd.sum / numbersOfProd.size)}
+        custId -> (numbersOfProd.sum, numbersOfProd.size, numbersOfProd.sum.toDouble / numbersOfProd.size)}
       .sortBy(_._1)
       .foreach { case (custId, (sumNumOfProd, countNumOfProd, avgNumOfProd)) =>
         println(s"customer_id: $custId, sum_num_of_product: $sumNumOfProd, " +
