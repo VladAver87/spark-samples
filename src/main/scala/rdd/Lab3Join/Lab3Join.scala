@@ -3,7 +3,7 @@ package rdd.Lab3Join
 import org.apache.spark.rdd.RDD
 import org.apache.spark.util.LongAccumulator
 import org.apache.spark.{SparkConf, SparkContext}
-import rdd.DataModels.{Customer, Order, Product}
+import rdd.model.DataModels.{Customer, Order, Product}
 
 import java.sql.Date
 import scala.util.{Failure, Success, Try}
