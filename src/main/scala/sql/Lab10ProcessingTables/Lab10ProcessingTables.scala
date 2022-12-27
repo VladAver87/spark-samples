@@ -1,21 +1,26 @@
-package sql.Lab9ProcessingTables
+package sql.Lab10ProcessingTables
 
-import org.apache.spark.sql.functions.broadcast
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
 import sql.schemas.Schemas.{customersSchema, ordersSchema, productsSchema}
 
 import java.sql.Date
 
 /*
- * Lab9 - пример использования filter, join, crossJoin, broadcast, orderBy
- * Вывести информацию о клиенте email, название продукта
- * и кол-во доставленного товара за первую половину 2018 года
- * Итоговое множество содержит поля: customer.email, product.name, order.order_date, order.number_of_product
- * */
+* Lab10 - пример использования join, broadcast, groupBy, agg
+* Необходимо расчитать для каждого клиента,
+* стоимость общей закупки каждого товара,
+* максимальный объем заказанного товара,
+* минимальную стоимость заказа,
+* среднюю стоимость заказа
+* за первую половину 2018 года, заказ должен быть доставлен
+* Итоговое множество содержит поля: customer.name, product.name, sum(order.number_of_product * price),
+* max(order.number_of_product), min(order.number_of_product * price), avg(order.number_of_product * price)
+ */
 
-class Lab9ProcessingTables(ordersFilePath: String,
-                           customersFilePath: String,
-                           productsFilePath: String)(implicit sqlContext: SQLContext) {
+class Lab10ProcessingTables(ordersFilePath: String,
+                            customersFilePath: String,
+                            productsFilePath: String)(implicit sqlContext: SQLContext) {
 
   def job(ordersFilePath: String = ordersFilePath,
           customersFilePath: String = customersFilePath,
@@ -34,7 +39,16 @@ class Lab9ProcessingTables(ordersFilePath: String,
       .join(broadcast(products), orders("product_id") === products("id"))
       .withColumnRenamed("name", "product_name")
       .withColumnRenamed("number_of_products", "prod_number_of_products")
-      .select("email", "product_name", "order_date", "ord_number_of_products")
+      .withColumn("total_price", column("ord_number_of_products") * column("price"))
+      .select("customer_name", "product_name", "total_price")
+      .groupBy("customer_name", "product_name")
+      .agg(
+        sum("total_price").as("sum_total_price"),
+        max("total_price").as("max_total_price"),
+        min("total_price").as("min_total_price"),
+        avg("total_price").as("avg_total_price")
+      )
+      .orderBy("customer_name")
       .show(numRows = 10, truncate = false)
 
   }
@@ -62,10 +76,10 @@ class Lab9ProcessingTables(ordersFilePath: String,
 
 }
 
-object Lab9ProcessingTables {
+object Lab10ProcessingTables {
   val sparkSession: SparkSession = SparkSession.builder()
     .master("local[*]")
-    .appName("Lab9ProcessingTables")
+    .appName("Lab10ProcessingTables")
     .getOrCreate()
   implicit val sqlContext: SQLContext = sparkSession.sqlContext
 }
@@ -76,7 +90,7 @@ object Test {
     val customersFilePath = ""
     val productsFilePath = ""
 
-    import Lab9ProcessingTables.sqlContext
-    new Lab9ProcessingTables(ordersFilePath, customersFilePath, productsFilePath).job()
+    import Lab10ProcessingTables.sqlContext
+    new Lab10ProcessingTables(ordersFilePath, customersFilePath, productsFilePath).job()
   }
 }

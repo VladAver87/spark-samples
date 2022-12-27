@@ -1,7 +1,7 @@
 package rdd.Lab1ReduceByKey
 
-import model.DataModels.Order
 import org.apache.spark.{SparkConf, SparkContext}
+import rdd.model.DataModels.Order
 
 import java.sql.Date
 import scala.util.Try

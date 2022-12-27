@@ -1,21 +1,19 @@
-package sql.Lab9ProcessingTables
+package sql.Lab11WindowFunction
 
-import org.apache.spark.sql.functions.broadcast
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions.{broadcast, column, rank, sum}
 import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
 import sql.schemas.Schemas.{customersSchema, ordersSchema, productsSchema}
 
-import java.sql.Date
-
 /*
- * Lab9 - пример использования filter, join, crossJoin, broadcast, orderBy
- * Вывести информацию о клиенте email, название продукта
- * и кол-во доставленного товара за первую половину 2018 года
- * Итоговое множество содержит поля: customer.email, product.name, order.order_date, order.number_of_product
+ * Lab11 - пример использования оконных выражений
+ * Необходимо определить самый популярный продукт у клиента
+ * Итоговое множество содержит поля: customer.name, product.name
  * */
 
-class Lab9ProcessingTables(ordersFilePath: String,
-                           customersFilePath: String,
-                           productsFilePath: String)(implicit sqlContext: SQLContext) {
+class Lab11WindowFunction(ordersFilePath: String,
+                          customersFilePath: String,
+                          productsFilePath: String)(implicit sqlContext: SQLContext) {
 
   def job(ordersFilePath: String = ordersFilePath,
           customersFilePath: String = customersFilePath,
@@ -25,17 +23,23 @@ class Lab9ProcessingTables(ordersFilePath: String,
     val customers = getCustomersDf(customersFilePath)
     val products = getProductsDf(productsFilePath)
 
+    val windowSpec = Window
+      .partitionBy(column("customer_id"), column("product_id"))
+      .orderBy(column("number_of_products"))
+    val windowSpecWithSum = Window
+      .partitionBy(column("customer_id"))
+      .orderBy(column("total").desc)
+
     orders
-      .filter(orders("order_date").between(Date.valueOf("2018-01-01"), Date.valueOf("2018-06-31"))
-        .and(orders("status").equalTo("delivered")))
-      .withColumnRenamed("number_of_products", "ord_number_of_products")
+      .withColumn("total", sum("number_of_products").over(windowSpec))
+      .withColumn("rank", rank().over(windowSpecWithSum))
       .join(broadcast(customers), orders("customer_id") === customers("id"))
       .withColumnRenamed("name", "customer_name")
       .join(broadcast(products), orders("product_id") === products("id"))
       .withColumnRenamed("name", "product_name")
-      .withColumnRenamed("number_of_products", "prod_number_of_products")
-      .select("email", "product_name", "order_date", "ord_number_of_products")
-      .show(numRows = 10, truncate = false)
+      .select("customer_name", "product_name").distinct()
+      .where(column("rank") === 1)
+      .show(truncate = false)
 
   }
 
@@ -62,10 +66,10 @@ class Lab9ProcessingTables(ordersFilePath: String,
 
 }
 
-object Lab9ProcessingTables {
+object Lab11WindowFunction {
   val sparkSession: SparkSession = SparkSession.builder()
     .master("local[*]")
-    .appName("Lab9ProcessingTables")
+    .appName("Lab11WindowFunction")
     .getOrCreate()
   implicit val sqlContext: SQLContext = sparkSession.sqlContext
 }
@@ -76,7 +80,7 @@ object Test {
     val customersFilePath = ""
     val productsFilePath = ""
 
-    import Lab9ProcessingTables.sqlContext
-    new Lab9ProcessingTables(ordersFilePath, customersFilePath, productsFilePath).job()
+    import Lab11WindowFunction.sqlContext
+    new Lab11WindowFunction(ordersFilePath, customersFilePath, productsFilePath).job()
   }
 }

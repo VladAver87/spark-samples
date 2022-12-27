@@ -1,8 +1,8 @@
 package sql.Lab8TableColumns
 
 import org.apache.spark.sql.functions.{col, lit, when}
-import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructType}
 import org.apache.spark.sql.{Column, SQLContext, SparkSession}
+import sql.schemas.Schemas.productsSchema
 
 /*
  * Lab8 - пример обработки полей при помощи select/withColumns
@@ -15,14 +15,9 @@ import org.apache.spark.sql.{Column, SQLContext, SparkSession}
 class Lab8TableColumns(productsFilePath: String)(implicit sqlContext: SQLContext) {
 
   def job(productsFilePath: String = productsFilePath): Unit = {
-    val schema = new StructType()
-      .add("id", IntegerType)
-      .add("name", StringType)
-      .add("price", DoubleType)
-      .add("number_of_products", IntegerType)
     sqlContext.read
       .options(Map("sep" -> "\t"))
-      .schema(schema)
+      .schema(productsSchema)
       .csv(path = productsFilePath)
       .withColumn("new_price",
         when(col("price") > 50000, col("price") - (col("price") / 10))
@@ -49,7 +44,7 @@ object Lab8TableColumns {
 
 object Test {
   def main(args: Array[String]): Unit = {
-    val productsFilePath = "/Users/vladislav/Documents/task_spark/dataset/product/product.csv"
+    val productsFilePath = ""
 
     import Lab8TableColumns.sqlContext
     new Lab8TableColumns(productsFilePath).job()

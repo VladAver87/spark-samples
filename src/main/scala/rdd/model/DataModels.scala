@@ -1,4 +1,4 @@
-package model
+package rdd.model
 
 import java.sql.Date
 
