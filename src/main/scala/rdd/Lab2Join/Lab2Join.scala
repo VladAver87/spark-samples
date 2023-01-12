@@ -2,7 +2,6 @@ package rdd.Lab2Join
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-
 import rdd.model.DataModels.{Order, Product}
 
 import java.sql.Date

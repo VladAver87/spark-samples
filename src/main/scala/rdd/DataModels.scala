@@ -1,4 +1,4 @@
-package rdd.model
+package rdd
 
 import java.sql.Date
 
@@ -26,5 +26,5 @@ object DataModels {
                     orderDate: Date,
                     status: String
                   )
-                 
+
 }
