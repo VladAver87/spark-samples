@@ -2,7 +2,7 @@ package rdd.Lab6AggregateBy
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
-import rdd.DataModels.Order
+import rdd.model.DataModels.Order
 
 import java.sql.Date
 import scala.util.Try
@@ -70,7 +70,7 @@ object Lab6AggregateBy {
 
 object Test {
   def main(args: Array[String]): Unit = {
-    val ordersFilePath = "/Users/vladislav/Documents/task_spark/dataset/order/order.csv"
+    val ordersFilePath = ""
 
     import Lab6AggregateBy.sc
     new Lab6AggregateBy(ordersFilePath).job(ordersFilePath = ordersFilePath)
