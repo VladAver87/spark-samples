@@ -2,7 +2,7 @@ package rdd.Lab4CompositeKey
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
-import rdd.DataModels.{Customer, Order, Product}
+import rdd.model.DataModels.{Customer, Order, Product}
 
 import java.sql.Date
 import scala.util.Try
